@@ -1,0 +1,40 @@
+{
+  "name": "sit-break-app",
+  "productName": "起身休息提醒",
+  "version": "0.1.0",
+  "description": "每隔一段時間提醒起身活動並暫時鎖定螢幕的桌面App，鎖定期間顯示健康知識卡片",
+  "main": "src/main.js",
+  "author": "Mou",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.mou.sitbreak",
+    "productName": "起身休息提醒",
+    "files": [
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.healthcare-fitness",
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  }
+}

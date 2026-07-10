@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<title>設定 — 起身休息提醒</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 24px 28px 40px;
+  }
+  h1 { font-size: 18px; margin-bottom: 20px; }
+  section {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  section h2 {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .row:last-child { margin-bottom: 0; }
+  label { font-size: 14px; }
+  input[type="number"] {
+    width: 70px;
+    padding: 5px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+  }
+  input[type="range"] { width: 200px; }
+  .hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+  .range-list, .content-list { display: flex; flex-direction: column; gap: 8px; }
+  .range-item, .content-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f1f5f9;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  button {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    background: #0ea5e9;
+    color: white;
+  }
+  button.secondary { background: #e2e8f0; color: #334155; }
+  button.danger { background: #fee2e2; color: #b91c1c; }
+  .add-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .add-row input { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 13px; }
+  .stats-grid div { background: #f1f5f9; border-radius: 6px; padding: 8px; text-align: center; }
+  .stats-grid .num { font-size: 18px; font-weight: 700; color: #0ea5e9; }
+  footer { font-size: 12px; color: #94a3b8; margin-top: 8px; }
+</style>
+</head>
+<body>
+  <h1>起身休息提醒 — 設定</h1>
+
+  <section>
+    <h2>提醒節奏</h2>
+    <div class="row">
+      <label>提醒間隔（分鐘）</label>
+      <input type="number" id="intervalMinutes" min="5" max="120" />
+    </div>
+    <div class="row">
+      <label>鎖定時長（分鐘）：<span id="lockMinutesVal">3</span></label>
+      <input type="range" id="lockMinutes" min="1" max="10" step="1" />
+    </div>
+    <div class="hint">醫學建議至少起立活動2分鐘；1分鐘選項保留給特殊情境彈性使用。</div>
+    <div class="row" style="margin-top:10px;">
+      <label>允許跳過本次提醒</label>
+      <input type="checkbox" id="allowSkip" />
+    </div>
+  </section>
+
+  <section>
+    <h2>啟用時間區段（留空 = 全天啟用）</h2>
+    <div class="range-list" id="rangeList"></div>
+    <div class="add-row">
+      <input type="time" id="rangeStart" />
+      <span>～</span>
+      <input type="time" id="rangeEnd" />
+      <button id="addRangeBtn">新增區段</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>學習內容（鎖定期間輪播顯示）</h2>
+    <div class="content-list" id="contentList"></div>
+    <div class="add-row">
+      <button id="addContentBtn">上傳圖片／文字檔</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>其他</h2>
+    <div class="row">
+      <label>開機自動啟動</label>
+      <input type="checkbox" id="autoLaunch" />
+    </div>
+    <div class="row">
+      <label>音效提醒</label>
+      <input type="checkbox" id="soundEnabled" />
+    </div>
+  </section>
+
+  <section style="position: sticky; bottom: 0; background: #fff; z-index: 10;">
+    <div class="row">
+      <button id="saveBtn" style="font-size:14px; padding:9px 20px;">儲存設定</button>
+      <span id="saveStatus" style="font-size:13px; color:#16a34a; opacity:0; transition:opacity .3s;">已儲存</span>
+    </div>
+    <div class="hint">提醒間隔、鎖定時長需按「儲存設定」才會生效；時間區段、學習內容、開關類設定會即時套用。</div>
+  </section>
+
+  <section>
+    <h2>今日統計</h2>
+    <div class="stats-grid">
+      <div><div class="num" id="statCompleted">0</div>完成休息</div>
+      <div><div class="num" id="statSkips">0</div>跳過次數</div>
+      <div><div class="num" id="statEmergency">0</div>緊急跳過</div>
+    </div>
+    <footer>緊急跳過不設限制，但誠實記錄給自己看，是提醒機制的一部分。</footer>
+  </section>
+
+  <script src="settings.js"></script>
+</body>
+</html>
