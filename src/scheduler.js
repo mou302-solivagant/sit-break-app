@@ -40,7 +40,13 @@ class Scheduler extends EventEmitter {
       const [eh, em] = end.split(':').map(Number);
       const s = sh * 60 + sm;
       const e = eh * 60 + em;
-      return hm >= s && hm < e;
+      if (e === s) return true; // start===end視為全天（避免使用者手殘設成同一時間變成永遠不啟用）
+      if (e > s) {
+        // 一般情況，例如 09:00～18:00
+        return hm >= s && hm < e;
+      }
+      // 跨半夜的情況，例如 22:00～02:00：只要在[22:00, 24:00)或[00:00, 02:00)都算啟用
+      return hm >= s || hm < e;
     });
   }
 

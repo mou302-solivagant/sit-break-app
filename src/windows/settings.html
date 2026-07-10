@@ -90,6 +90,14 @@
       <label>允許跳過本次提醒</label>
       <input type="checkbox" id="allowSkip" />
     </div>
+    <div class="row">
+      <label>跳過等待秒數（逾時自動鎖定）</label>
+      <input type="number" id="skipWindowSeconds" min="5" max="120" />
+    </div>
+    <div class="row">
+      <label>鎖定前先跳出系統通知</label>
+      <input type="checkbox" id="notifyBeforeLock" />
+    </div>
   </section>
 
   <section>
@@ -101,6 +109,7 @@
       <input type="time" id="rangeEnd" />
       <button id="addRangeBtn">新增區段</button>
     </div>
+    <div class="hint">支援跨半夜的區段，例如 22:00～02:00 也可以正常設定。</div>
   </section>
 
   <section>

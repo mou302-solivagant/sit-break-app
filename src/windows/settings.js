@@ -9,6 +9,8 @@ async function load() {
   document.getElementById('lockMinutes').value = settings.lockMinutes;
   document.getElementById('lockMinutesVal').textContent = settings.lockMinutes;
   document.getElementById('allowSkip').checked = settings.allowSkip;
+  document.getElementById('skipWindowSeconds').value = settings.skipWindowSeconds;
+  document.getElementById('notifyBeforeLock').checked = settings.notifyBeforeLock;
   document.getElementById('autoLaunch').checked = settings.autoLaunch;
   document.getElementById('soundEnabled').checked = settings.soundEnabled;
 
@@ -77,6 +79,11 @@ document.getElementById('lockMinutes').addEventListener('input', (e) => {
 document.getElementById('allowSkip').addEventListener('change', async (e) => {
   settings = await window.api.updateSettings({ allowSkip: e.target.checked });
 });
+document.getElementById('notifyBeforeLock').addEventListener('change', async (e) => {
+  settings = await window.api.updateSettings({ notifyBeforeLock: e.target.checked });
+});
+// skipWindowSeconds是數字輸入框，跟intervalMinutes一樣容易因為關窗來不及觸發change而漏存，
+// 一併交給下面「儲存設定」按鈕統一處理
 document.getElementById('autoLaunch').addEventListener('change', async (e) => {
   settings = await window.api.updateSettings({ autoLaunch: e.target.checked });
 });
@@ -101,13 +108,15 @@ document.getElementById('addContentBtn').addEventListener('click', async () => {
 document.getElementById('saveBtn').addEventListener('click', async () => {
   const intervalMinutes = Number(document.getElementById('intervalMinutes').value);
   const lockMinutes = Number(document.getElementById('lockMinutes').value);
-  settings = await window.api.updateSettings({ intervalMinutes, lockMinutes });
+  const skipWindowSeconds = Number(document.getElementById('skipWindowSeconds').value);
+  settings = await window.api.updateSettings({ intervalMinutes, lockMinutes, skipWindowSeconds });
 
   // 重新從主行程拿一次最新設定，確保畫面顯示的一定是「真的已經存進去」的值
   settings = await window.api.getSettings();
   document.getElementById('intervalMinutes').value = settings.intervalMinutes;
   document.getElementById('lockMinutes').value = settings.lockMinutes;
   document.getElementById('lockMinutesVal').textContent = settings.lockMinutes;
+  document.getElementById('skipWindowSeconds').value = settings.skipWindowSeconds;
 
   const statusEl = document.getElementById('saveStatus');
   statusEl.style.opacity = '1';

@@ -268,9 +268,11 @@ function createTray() {
   // Mac選單列圖示建議設為template image比例(16x16)，這裡用resize確保尺寸正確
   tray = new Tray(icon.resize({ width: 18, height: 18 }));
   tray.setToolTip('起身休息提醒');
-  tray.setContextMenu(buildTrayMenu());
+  // 不用 setContextMenu()：那會讓左鍵點擊也強制跳出選單，跟「左鍵開設定視窗」互搶事件，
+  // 導致選單擋住設定視窗、滑鼠卡住要先點掉選單才能操作設定頁的bug。
+  // 改成左鍵開設定視窗、右鍵才彈出小選單（Mac/Win使用者熟悉的標準Tray互動方式）。
   tray.on('click', () => openSettingsWindow());
-  setInterval(() => tray && tray.setContextMenu(buildTrayMenu()), 60 * 1000);
+  tray.on('right-click', () => tray.popUpContextMenu(buildTrayMenu()));
 }
 
 // 32x32藍色圓點PNG作為預設Tray圖示（之後可換成正式icon檔）；
