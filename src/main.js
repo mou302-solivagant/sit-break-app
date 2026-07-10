@@ -144,7 +144,15 @@ function startScheduler() {
       openLockWindows();
     }
   });
+  scheduler.on('tick', ({ withinRange, remainingMs }) => {
+    updateTrayTooltip(withinRange, remainingMs);
+  });
   scheduler.start();
+  // 啟動當下先算一次，避免要等到第一個tick(最多5秒)才有內容
+  updateTrayTooltip(
+    scheduler.isWithinActiveRange(),
+    store.get('nextReminderAt') - Date.now()
+  );
 }
 
 ipcMain.on('skip-confirm', () => {
@@ -261,6 +269,18 @@ function buildTrayMenu() {
     { type: 'separator' },
     { label: '結束程式', click: () => { app.isQuiting = true; app.quit(); } }
   ]);
+}
+
+// 滑鼠移到選單列圖示上時（不用右鍵）就能看到的提示文字，
+// 隨scheduler每次tick更新，所以停留在圖示上會看到「即時」的剩餘時間。
+function updateTrayTooltip(withinRange, remainingMs) {
+  if (!tray || tray.isDestroyed()) return;
+  if (!withinRange) {
+    tray.setToolTip('起身休息提醒（目前不在啟用時段）');
+    return;
+  }
+  const remainingMin = Math.max(0, Math.round(remainingMs / 60000));
+  tray.setToolTip(`起身休息提醒\n下次休息約 ${remainingMin} 分鐘後`);
 }
 
 function createTray() {
