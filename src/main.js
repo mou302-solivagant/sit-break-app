@@ -17,6 +17,17 @@ if (!fs.existsSync(contentDir)) fs.mkdirSync(contentDir, { recursive: true });
 
 const autoLauncher = new AutoLaunch({ name: '起身休息提醒' });
 
+// ---------- 雅思口說詞組：首次啟動時一次性加入學習內容（刪除後不會再加回來） ----------
+function seedIeltsContent() {
+  if (store.get('ieltsSeeded')) return;
+  const items = store.get('contentItems');
+  const existing = new Set(items.map((i) => i.id));
+  const ielts = require('./ieltsContent').filter((c) => !existing.has(c.id));
+  store.set('contentItems', items.concat(ielts));
+  store.set('ieltsSeeded', true);
+}
+seedIeltsContent();
+
 // ---------- 內容輪播資料（含使用者上傳圖片轉為 dataUrl 供鎖定畫面顯示） ----------
 function getRenderableContentItems() {
   const items = store.get('contentItems');

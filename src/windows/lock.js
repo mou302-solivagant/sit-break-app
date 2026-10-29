@@ -59,7 +59,8 @@ function tickCountdown() {
 window.api.onLockInit((data) => {
   endAt = data.endAt;
   items = data.items || [];
-  itemIndex = 0;
+  // 隨機從某張卡片開始，內容變多後每次休息才不會永遠只看到前幾張
+  itemIndex = items.length ? Math.floor(Math.random() * items.length) : 0;
   renderCard();
   tickCountdown();
   countdownTimer = setInterval(tickCountdown, 250);
