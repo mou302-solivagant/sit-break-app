@@ -18,6 +18,22 @@ function formatTime(ms) {
   return `${m}:${s}`;
 }
 
+// 洗牌（Fisher-Yates）
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// 雅思詞組卡片排前面，其餘卡片接在後面；兩組各自隨機排序，每次休息順序都不同
+function orderItems(list) {
+  const isIelts = (i) => typeof i.id === 'string' && i.id.startsWith('ielts-');
+  return shuffle(list.filter(isIelts)).concat(shuffle(list.filter((i) => !isIelts(i))));
+}
+
 function renderCard() {
   if (!items.length) {
     cardTitleEl.textContent = '起身走走吧';
@@ -58,9 +74,8 @@ function tickCountdown() {
 
 window.api.onLockInit((data) => {
   endAt = data.endAt;
-  items = data.items || [];
-  // 隨機從某張卡片開始，內容變多後每次休息才不會永遠只看到前幾張
-  itemIndex = items.length ? Math.floor(Math.random() * items.length) : 0;
+  items = orderItems(data.items || []);
+  itemIndex = 0;
   renderCard();
   tickCountdown();
   countdownTimer = setInterval(tickCountdown, 250);
