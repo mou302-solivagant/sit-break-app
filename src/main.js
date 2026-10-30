@@ -17,14 +17,13 @@ if (!fs.existsSync(contentDir)) fs.mkdirSync(contentDir, { recursive: true });
 
 const autoLauncher = new AutoLaunch({ name: '起身休息提醒' });
 
-// ---------- 雅思口說詞組：首次啟動時一次性加入學習內容（刪除後不會再加回來） ----------
+// ---------- 雅思口說詞組：內容版本更新時，換掉舊的 ielts- 卡片（版本號沒變就不會動，使用者刪除的不會加回來） ----------
+const IELTS_CONTENT_VERSION = 2;
 function seedIeltsContent() {
-  if (store.get('ieltsSeeded')) return;
-  const items = store.get('contentItems');
-  const existing = new Set(items.map((i) => i.id));
-  const ielts = require('./ieltsContent').filter((c) => !existing.has(c.id));
-  store.set('contentItems', items.concat(ielts));
-  store.set('ieltsSeeded', true);
+  if (store.get('ieltsContentVersion') === IELTS_CONTENT_VERSION) return;
+  const items = store.get('contentItems').filter((i) => !String(i.id).startsWith('ielts-'));
+  store.set('contentItems', items.concat(require('./ieltsContent')));
+  store.set('ieltsContentVersion', IELTS_CONTENT_VERSION);
 }
 seedIeltsContent();
 
